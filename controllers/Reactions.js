@@ -1,12 +1,12 @@
-const { Thought, User, Reaction } = require('../models');
+const { Thoughts, User, Reaction } = require('../models');
 
 const reactionController = {
     addReaction({ params, body}, res){
         console.log(params)
         Reaction.create(body)
         .then(({ _id }) => {
-            return Thought.findOneAndUpdate(
-                { _id: params.id },
+            return Thoughts.findOneAndUpdate(
+                { _id: params.thoughtId },
                 { $push: { reactions: _id }},
                 { new: true }
             )
@@ -23,11 +23,20 @@ const reactionController = {
     removeReaction({params}, res){
         Reaction.findOneAndDelete({ _id: params.id})
         .then(deletedReaction => {
-            if(deletedReaction){
+            if(!deletedReaction){
                 res.status(404).json({ message: 'No reaction with this id' })
                 return;
             }
-            res.json(deletedReaction)
+            return Thoughts.findOneAndUpdate(
+                { _id: params.thoughtId },
+                { $pull: { reactions: params.id } }
+            )
+        }).then(thoughtData => {
+            if(!thoughtData){
+                res.status(404).json({ message: 'No thought with this id' });
+                return;
+            }
+            res.json(thoughtData)
         })
         .catch(err => res.json(err))
     }

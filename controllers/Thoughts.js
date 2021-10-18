@@ -1,14 +1,14 @@
-const {Thought, User} = require('../models');
+const {Thoughts, User} = require('../models');
 
 const thoughtController = {
     getAllThoughts(req, res){
-        Thought.find({}).populate({path: 'reactions'}).then(thoughtData => res.json(thoughtData))
+        Thoughts.find({}).populate({path: 'reactions'}).populate({path: 'username', select: 'firstName'}).then(thoughtData => res.json(thoughtData))
         .catch(err => res.sendStatus(400).json(err))
     },
 
     createThought({ params, body}, res){
         console.log(params)
-        Thought.create(body)
+        Thoughts.create(body)
         .then(({ _id }) => {
             return User.findOneAndUpdate(
                 { _id: params.id },
@@ -27,7 +27,7 @@ const thoughtController = {
     },
 
     updateThought({params, body}, res){
-        Thought.findOneAndUpdate({_id: params.id}, body, {new: true})
+        Thoughts.findOneAndUpdate({_id: params.id}, body, {new: true})
         .then(thoughtData => {
             if(!thoughtData){
                 res.status(404).json({message: 'No thought found with this id'})
@@ -39,16 +39,26 @@ const thoughtController = {
     },
 
     deleteThought({params}, res){
-        Thought.findOneAndDelete({_id: params.id})
+        Thoughts.findOneAndDelete({_id: params.id})
         .then(thoughtData => {
             if(!thoughtData){
                 res.status(404).json({message: 'No though with this id'})
                 return;
             }
-            res.json(thoughtData)
-        })
-        .catch(err => res.status(400).json(err))
-    }
+            return User.findOneAndUpdate(
+                { _id: params.userId },
+                { $pull: { thoughts: params.id }}
+            )
+        }).then(userData => {
+            if(!userData){
+                res.status(404).json({ message: 'No user with this id' });
+                return;
+            }
+            res.json(userData)
+
+        }).catch(err => res.status(400).json(err))
+    
+    }      
 };
 
 module.exports = thoughtController;

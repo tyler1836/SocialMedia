@@ -10,6 +10,13 @@ const ThoughtSchema = new Schema(
             minlength: 1,
             maxlength: 280
         },
+        username: [{
+            type: Schema.Types.ObjectId,
+            ref:'User',
+            required: true,
+            default: () => new Types.ObjectId()
+
+        }],
         createdAt: {
             type: Date,
             default: Date.now,

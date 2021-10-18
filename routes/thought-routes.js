@@ -14,7 +14,9 @@ router
 router
     .route('/:id')
     .post(createThought)
-    .put(updateThought)
+    .put(updateThought);
+router
+    .route('/:id/:userId')
     .delete(deleteThought);
 
 module.exports = router;
