@@ -3,12 +3,9 @@ const { User } = require('../models');
 const userController = {
     getUsers(req, res){
         User.find({})
-        .populate({ path: 'thoughts'})
-    .populate({ path: 'friends',
-        populate: [{ path: '_id', 
-        populate: 'firstName'}]
-    })
-       
+        .populate({ path: 'thoughts',
+        populate:  {path: 'reactions', model: 'Reaction'} } )
+        .populate({ path: 'friends' } )
         .then(userData => res.json(userData))
         .catch(err => res.status(400).json(err))
     },

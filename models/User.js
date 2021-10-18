@@ -38,6 +38,10 @@ const UserSchema = new Schema(
     friends: [{
       type: Schema.Types.ObjectId,
       ref: 'User'
+    }], 
+    reactions: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Reaction'
     }]
   },
   {

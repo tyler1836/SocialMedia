@@ -5,10 +5,10 @@ const {
 } = require('../controllers/Reactions');
 
 router
-    .route('/:thoughtId/reactions')
+    .route('/:thoughtId')
     .post(addReaction);
 router
-    .route('/:thoughtId/reactions/:id')
+    .route('/:thoughtId/:id')
     .delete(removeReaction)
 
 module.exports = router;
